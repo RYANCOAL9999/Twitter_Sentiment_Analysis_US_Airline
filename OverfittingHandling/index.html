@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Handling overfitting in deep learning models</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>index</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7500,47 +7500,33 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Basic packages</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">re</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-
-<span class="c1"># Packages for data preparation</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
-<span class="kn">from</span> <span class="nn">keras.preprocessing.text</span> <span class="kn">import</span> <span class="n">Tokenizer</span>
-<span class="kn">from</span> <span class="nn">keras.utils.np_utils</span> <span class="kn">import</span> <span class="n">to_categorical</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
-
-<span class="c1"># Packages for modeling</span>
 <span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">models</span>
 <span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">layers</span>
 <span class="kn">from</span> <span class="nn">keras</span> <span class="kn">import</span> <span class="n">regularizers</span>
+<span class="kn">from</span> <span class="nn">nltk.corpus</span> <span class="kn">import</span> <span class="n">stopwords</span>
+<span class="kn">from</span> <span class="nn">keras.preprocessing.text</span> <span class="kn">import</span> <span class="n">Tokenizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">from</span> <span class="nn">keras.utils.np_utils</span> <span class="kn">import</span> <span class="n">to_categorical</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Using TensorFlow backend.
-</pre>
 </div>
 </div>
 </div>
@@ -7582,51 +7568,26 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">deep_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to train a multi-class model. The number of epochs and </span>
-<span class="sd">    batch_size are set by the constants at the top of the</span>
-<span class="sd">    notebook. </span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        model : model with the chosen architecture</span>
-<span class="sd">        X_train : training features</span>
-<span class="sd">        y_train : training target</span>
-<span class="sd">        X_valid : validation features</span>
-<span class="sd">        Y_valid : validation target</span>
-<span class="sd">    Output:</span>
-<span class="sd">        model training history</span>
-<span class="sd">    '''</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">'rmsprop'</span>
-                  <span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">'categorical_crossentropy'</span>
-                  <span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">'accuracy'</span><span class="p">])</span>
-    
-    <span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span>
-                       <span class="p">,</span> <span class="n">y_train</span>
-                       <span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">NB_START_EPOCHS</span>
-                       <span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span>
-                       <span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span>
-                       <span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="s1">'rmsprop'</span><span class="p">,</span> 
+        <span class="n">loss</span><span class="o">=</span><span class="s1">'categorical_crossentropy'</span><span class="p">,</span> 
+        <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">'accuracy'</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="n">X_train</span><span class="p">,</span> 
+        <span class="n">y_train</span><span class="p">,</span>
+        <span class="n">epochs</span><span class="o">=</span><span class="n">NB_START_EPOCHS</span><span class="p">,</span> 
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> 
+        <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">),</span> 
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">history</span>
 
 
 <span class="k">def</span> <span class="nf">eval_metric</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to evaluate a trained model on a chosen metric. </span>
-<span class="sd">    Training and validation metric are plotted in a</span>
-<span class="sd">    line chart for each epoch.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        history : model training history</span>
-<span class="sd">        metric_name : loss or accuracy</span>
-<span class="sd">    Output:</span>
-<span class="sd">        line chart with epochs of x-axis and metric on</span>
-<span class="sd">        y-axis</span>
-<span class="sd">    '''</span>
     <span class="n">metric</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">metric_name</span><span class="p">]</span>
     <span class="n">val_metric</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">'val_'</span> <span class="o">+</span> <span class="n">metric_name</span><span class="p">]</span>
-
     <span class="n">e</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NB_START_EPOCHS</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="s1">'bo'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Train '</span> <span class="o">+</span> <span class="n">metric_name</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">val_metric</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Validation '</span> <span class="o">+</span> <span class="n">metric_name</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Epoch number'</span><span class="p">)</span>
@@ -7636,25 +7597,13 @@ a.anchor-link {
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">epoch_stop</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to test the model on new data after training it</span>
-<span class="sd">    on the full training data with the optimal number of epochs.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        model : trained model</span>
-<span class="sd">        X_train : training features</span>
-<span class="sd">        y_train : training target</span>
-<span class="sd">        X_test : test features</span>
-<span class="sd">        y_test : test target</span>
-<span class="sd">        epochs : optimal number of epochs</span>
-<span class="sd">    Output:</span>
-<span class="sd">        test accuracy and test loss</span>
-<span class="sd">    '''</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span>
-              <span class="p">,</span> <span class="n">y_train</span>
-              <span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">epoch_stop</span>
-              <span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span>
-              <span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="n">X_train</span><span class="p">,</span> 
+        <span class="n">y_train</span><span class="p">,</span> 
+        <span class="n">epochs</span><span class="o">=</span><span class="n">epoch_stop</span><span class="p">,</span> 
+        <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span> 
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
     <span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">'Test accuracy: </span><span class="si">{0:.2f}</span><span class="s1">%'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
@@ -7662,14 +7611,6 @@ a.anchor-link {
 
     
 <span class="k">def</span> <span class="nf">remove_stopwords</span><span class="p">(</span><span class="n">input_text</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to remove English stopwords from a Pandas Series.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        input_text : text to clean</span>
-<span class="sd">    Output:</span>
-<span class="sd">        cleaned Pandas Series </span>
-<span class="sd">    '''</span>
     <span class="n">stopwords_list</span> <span class="o">=</span> <span class="n">stopwords</span><span class="o">.</span><span class="n">words</span><span class="p">(</span><span class="s1">'english'</span><span class="p">)</span>
     <span class="c1"># Some words which might indicate a certain sentiment are kept via a whitelist</span>
     <span class="n">whitelist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"n't"</span><span class="p">,</span> <span class="s2">"not"</span><span class="p">,</span> <span class="s2">"no"</span><span class="p">]</span>
@@ -7678,43 +7619,20 @@ a.anchor-link {
     <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clean_words</span><span class="p">)</span> 
     
 <span class="k">def</span> <span class="nf">remove_mentions</span><span class="p">(</span><span class="n">input_text</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to remove mentions, preceded by @, in a Pandas Series</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        input_text : text to clean</span>
-<span class="sd">    Output:</span>
-<span class="sd">        cleaned Pandas Series </span>
-<span class="sd">    '''</span>
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">'@\w+'</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="n">input_text</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">compare_models_by_metric</span><span class="p">(</span><span class="n">model_1</span><span class="p">,</span> <span class="n">model_2</span><span class="p">,</span> <span class="n">model_hist_1</span><span class="p">,</span> <span class="n">model_hist_2</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to compare a metric between two models </span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        model_hist_1 : training history of model 1</span>
-<span class="sd">        model_hist_2 : training history of model 2</span>
-<span class="sd">        metrix : metric to compare, loss, acc, val_loss or val_acc</span>
-<span class="sd">        </span>
-<span class="sd">    Output:</span>
-<span class="sd">        plot of metrics of both models</span>
-<span class="sd">    '''</span>
     <span class="n">metric_model_1</span> <span class="o">=</span> <span class="n">model_hist_1</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
     <span class="n">metric_model_2</span> <span class="o">=</span> <span class="n">model_hist_2</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
-
     <span class="n">e</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NB_START_EPOCHS</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-    
     <span class="n">metrics_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">'acc'</span> <span class="p">:</span> <span class="s1">'Training Accuracy'</span><span class="p">,</span>
         <span class="s1">'loss'</span> <span class="p">:</span> <span class="s1">'Training Loss'</span><span class="p">,</span>
         <span class="s1">'val_acc'</span> <span class="p">:</span> <span class="s1">'Validation accuracy'</span><span class="p">,</span>
         <span class="s1">'val_loss'</span> <span class="p">:</span> <span class="s1">'Validation loss'</span>
     <span class="p">}</span>
-    
     <span class="n">metric_label</span> <span class="o">=</span> <span class="n">metrics_dict</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
-
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">metric_model_1</span><span class="p">,</span> <span class="s1">'bo'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">model_1</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">metric_model_2</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">model_2</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Epoch number'</span><span class="p">)</span>
@@ -7724,16 +7642,6 @@ a.anchor-link {
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     
 <span class="k">def</span> <span class="nf">optimal_epoch</span><span class="p">(</span><span class="n">model_hist</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">'''</span>
-<span class="sd">    Function to return the epoch number where the validation loss is</span>
-<span class="sd">    at its minimum</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">        model_hist : training history of model</span>
-
-<span class="sd">    Output:</span>
-<span class="sd">        epoch number with minimum validation loss</span>
-<span class="sd">    '''</span>
     <span class="n">min_epoch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">model_hist</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s1">'val_loss'</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Minimum validation loss reached in epoch </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_epoch</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">min_epoch</span>
@@ -7834,13 +7742,14 @@ a.anchor-link {
 <div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">tk</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">(</span><span class="n">num_words</span><span class="o">=</span><span class="n">NB_WORDS</span><span class="p">,</span>
-               <span class="n">filters</span><span class="o">=</span><span class="s1">'!"#$%&amp;()*+,-./:;&lt;=&gt;?@[</span><span class="se">\\</span><span class="s1">]^_`{|}~</span><span class="se">\t\n</span><span class="s1">'</span><span class="p">,</span>
-               <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="n">char_level</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-               <span class="n">split</span><span class="o">=</span><span class="s1">' '</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tk</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">(</span>
+    <span class="n">num_words</span><span class="o">=</span><span class="n">NB_WORDS</span><span class="p">,</span>
+    <span class="n">filters</span><span class="o">=</span><span class="s1">'!"#$%&amp;()*+,-./:;&lt;=&gt;?@[</span><span class="se">\\</span><span class="s1">]^_`{|}~</span><span class="se">\t\n</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">lower</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">char_level</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">split</span><span class="o">=</span><span class="s1">' '</span>
+<span class="p">)</span>
 <span class="n">tk</span><span class="o">.</span><span class="n">fit_on_texts</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="s1">'Fitted tokenizer on </span><span class="si">{}</span><span class="s1"> documents'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">document_count</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">{}</span><span class="s1"> words in dictionary'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">num_words</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'Top 5 most common words are:'</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">word_counts</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
@@ -7914,7 +7823,6 @@ Top 5 most common words are: [('flight', 3517), ('not', 1407), ('no', 1347), ('g
 <span class="n">y_test_le</span> <span class="o">=</span> <span class="n">le</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_test</span><span class="p">)</span>
 <span class="n">y_train_oh</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">y_train_le</span><span class="p">)</span>
 <span class="n">y_test_oh</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">y_test_le</span><span class="p">)</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="s1">'"</span><span class="si">{}</span><span class="s1">" is converted into </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_train</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_train_le</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'"</span><span class="si">{}</span><span class="s1">" is converted into </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_train_le</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_train_oh</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 </pre></div>
@@ -7956,10 +7864,8 @@ Top 5 most common words are: [('flight', 3517), ('not', 1407), ('no', 1347), ('g
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">X_train_rest</span><span class="p">,</span> <span class="n">X_valid</span><span class="p">,</span> <span class="n">y_train_rest</span><span class="p">,</span> <span class="n">y_valid</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_train_oh</span><span class="p">,</span> <span class="n">y_train_oh</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">37</span><span class="p">)</span>
-
 <span class="k">assert</span> <span class="n">X_valid</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y_valid</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="k">assert</span> <span class="n">X_train_rest</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y_train_rest</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="s1">'Shape of validation set:'</span><span class="p">,</span><span class="n">X_valid</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
